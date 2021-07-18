@@ -16,69 +16,56 @@ namespace ConsoleApp1
             IWebDriver driver = new ChromeDriver();
                 driver.Url = "https://www.dota2.com/news";
 
-            
+            //Creating js executor
+            IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
 
-            if (String.Compare(driver.Title, "Dota News and Updates")==0){
-
-                Console.WriteLine("Isti title");
-            }
-            else
-            {
-                Console.WriteLine("Razlicit title");
-            }
-
-           
+       
             string comparisonTitle=string.Empty;
             bool notFirstIteration = false;
+
+            LinkHandler lh = new LinkHandler((ChromeDriver)driver);
+
             try
             {
                 while (true)
                 {
-                    System.Threading.Thread.Sleep(15000);
+                    System.Threading.Thread.Sleep(10000);
 
 
 
                     IWebElement featuredTitle = driver.FindElement(By.XPath("/ html / body / div[2] / div / div / div[2] / div[1] / div[4] / div[3]"));
-                    Console.WriteLine(featuredTitle.GetAttribute("class"));
-
-                    featuredTitle.Click();
 
 
-                    IJavaScriptExecutor js = (IJavaScriptExecutor)driver;
                     //Comparing text from previous iteration with current one, if the iteration isn't the first
 
                     if (notFirstIteration)
                     {
                         if (String.Compare(comparisonTitle, featuredTitle.Text) != 0)
                         {
+                            //Finding the new link and opening it in a new tab with JavaScript
+                            //IWebElement link = driver.FindElement(By.ClassName("blogoverviewpage_FeaturedLink_SffNe"));
+                            //lh.openNewEntry(link);
+                            //lh.openLinks();
+
                             Console.WriteLine("New news!!" + featuredTitle.Text);
-                            
 
-                            {
-                                Console.WriteLine("No new news.");
-                            }
                         }
-                        ReadOnlyCollection<string> rdOnly = driver.WindowHandles;
-                        List<string> windowHandles = new List<string>(rdOnly);
-
-                        foreach (string a in windowHandles)
+                        else
                         {
-                            Console.WriteLine(a);
+                            Console.WriteLine("No new news.");
                         }
+
+
                     }
-                    comparisonTitle = featuredTitle.Text;
 
-                    Console.WriteLine(featuredTitle.Text+"\n\n\n\n");
-                    ReadOnlyCollection<string> windowHandlesCollection=driver.WindowHandles;
+                    //Finding the new link and opening it in a new tab with JavaScript, here for testing purposes
                     IWebElement link = driver.FindElement(By.ClassName("blogoverviewpage_FeaturedLink_SffNe"));
-                    js.ExecuteScript("window.open(arguments[0])", link.GetAttribute("href"));
+                    lh.openNewEntry(link);
+                    lh.openLinks();
 
-
-                  
-                    //foreach (string a in array)
-                    //{
-                    //    Console.WriteLine(a);
-                    //}
+                    comparisonTitle = featuredTitle.Text;
+                    Console.WriteLine(featuredTitle.Text+"\n\n\n\n");
+                   
 
                     notFirstIteration = true;
                     System.Threading.Thread.Sleep(10000);
